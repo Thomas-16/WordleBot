@@ -390,6 +390,69 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &141739652
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 141739655}
+  - component: {fileID: 141739654}
+  - component: {fileID: 141739653}
+  m_Layer: 0
+  m_Name: WordList
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &141739653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141739652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e974d20191595544a80fa9967d63797, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WordDataLoader
+  allWordsPath: all_words
+  possibleWordsPath: possible_wordle_words
+--- !u!114 &141739654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141739652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 595c8a168665976429a48d644df18269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WordList
+  allValidWords: []
+  possibleAnswers: []
+  totalValidWords: 0
+  totalPossibleAnswers: 0
+--- !u!4 &141739655
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141739652}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1391.2621, y: 740.2585, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &219259112
 GameObject:
   m_ObjectHideFlags: 0
@@ -3198,6 +3261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abaecb6c67c8e12458c6c98d325a00a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridUI
+  rows: []
 --- !u!1001 &1638132241
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3987,3 +4051,4 @@ SceneRoots:
   - {fileID: 814067226}
   - {fileID: 1199247619}
   - {fileID: 1569222012}
+  - {fileID: 141739655}

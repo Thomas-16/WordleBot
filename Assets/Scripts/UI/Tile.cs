@@ -1,16 +1,15 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Tile : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    private TextMeshProUGUI letterText;
+    private Image background;
 
-    // Update is called once per frame
-    void Update()
+    void Awake()
     {
-        
+        letterText = GetComponentInChildren<TextMeshProUGUI>();
+        background = GetComponent<Image>();
     }
 }
