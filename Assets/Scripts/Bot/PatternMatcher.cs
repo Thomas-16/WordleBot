@@ -9,9 +9,6 @@ public static class PatternMatcher
     /// </summary>
     public static GuessResult EvaluateGuess(string guess, string answer)
     {
-        guess = guess.ToUpper();
-        answer = answer.ToUpper();
-
         GuessResult result = new GuessResult(guess);
 
         // Track which answer letters have been "used"

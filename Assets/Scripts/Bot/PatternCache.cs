@@ -198,37 +198,11 @@ public class PatternCache
     }
 
     /// <summary>
-    /// Fast O(1) pattern lookup from cache
-    /// </summary>
-    public int GetPattern(string guess, string answer)
-    {
-        guess = guess.ToUpper();
-        answer = answer.ToUpper();
-
-        if (!patternMatrix.ContainsKey(guess))
-        {
-            Debug.LogWarning($"Pattern cache miss for guess: {guess}");
-            return PatternMatcher.GetPattern(guess, answer);
-        }
-
-        if (!answerToIndex.ContainsKey(answer))
-        {
-            Debug.LogWarning($"Pattern cache miss for answer: {answer}");
-            return PatternMatcher.GetPattern(guess, answer);
-        }
-
-        int answerIndex = answerToIndex[answer];
-        return patternMatrix[guess][answerIndex];
-    }
-
-    /// <summary>
     /// Calculate entropy directly from cached patterns - avoids building distribution dictionary
     /// Should be much faster than GetPatternDistribution + manual calculation
     /// </summary>
     public float CalculateEntropy(string guess, List<string> possibleAnswers)
     {
-        guess = guess.ToUpper();
-
         if (!patternMatrix.ContainsKey(guess))
         {
             Debug.LogWarning($"Pattern cache miss for guess: {guess}");
@@ -243,12 +217,10 @@ public class PatternCache
 
         foreach (string answer in possibleAnswers)
         {
-            string upperAnswer = answer.ToUpper();
-
-            if (!answerToIndex.ContainsKey(upperAnswer))
+            if (!answerToIndex.ContainsKey(answer))
                 continue;
 
-            int answerIndex = answerToIndex[upperAnswer];
+            int answerIndex = answerToIndex[answer];
             int patternId = patterns[answerIndex];
 
             patternCounts[patternId]++;

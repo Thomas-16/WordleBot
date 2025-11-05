@@ -10,7 +10,7 @@ public class GuessResult
 
     public GuessResult(string guess)
     {
-        this.guess = guess.ToUpper();
+        this.guess = guess;
         results = new LetterResult[5];
     }
 

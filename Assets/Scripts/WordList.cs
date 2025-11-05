@@ -59,7 +59,7 @@ public class WordList : MonoBehaviour
     public bool IsValidWord(string word)
     {
         if (string.IsNullOrEmpty(word)) return false;
-        return validWordSet.Contains(word.ToUpper());
+        return validWordSet.Contains(word);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class WordList : MonoBehaviour
     public bool IsPossibleAnswer(string word)
     {
         if (string.IsNullOrEmpty(word)) return false;
-        return answerWordSet.Contains(word.ToUpper());
+        return answerWordSet.Contains(word);
     }
 
     /// <summary>
