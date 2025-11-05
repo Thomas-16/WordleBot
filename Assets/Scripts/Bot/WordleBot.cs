@@ -40,17 +40,14 @@ public class WordleBot
 
     public float CalculateExpectedEntropy(string guess)
     {
-        // Use cache if available, otherwise fall back to direct calculation
-        Dictionary<int, List<string>> patterns;
-
+        // Use direct entropy calculation from cache (avoids building distribution dictionary)
         if (patternCache != null && patternCache.IsInitialized())
         {
-            patterns = patternCache.GetPatternDistribution(guess, remainingPossibleWords);
+            return patternCache.CalculateEntropy(guess, remainingPossibleWords);
         }
-        else
-        {
-            patterns = PatternMatcher.GetPatternDistribution(guess, remainingPossibleWords);
-        }
+
+        // Fallback: build distribution and calculate manually
+        Dictionary<int, List<string>> patterns = PatternMatcher.GetPatternDistribution(guess, remainingPossibleWords);
 
         float sum = 0;
         foreach (var pattern in patterns)

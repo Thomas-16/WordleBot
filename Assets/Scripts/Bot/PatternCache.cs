@@ -222,41 +222,53 @@ public class PatternCache
     }
 
     /// <summary>
-    /// Fast pattern distribution using cached patterns
+    /// Calculate entropy directly from cached patterns - avoids building distribution dictionary
+    /// Should be much faster than GetPatternDistribution + manual calculation
     /// </summary>
-    public Dictionary<int, List<string>> GetPatternDistribution(string guess, List<string> possibleAnswers)
+    public float CalculateEntropy(string guess, List<string> possibleAnswers)
     {
         guess = guess.ToUpper();
-        Dictionary<int, List<string>> distribution = new Dictionary<int, List<string>>();
 
         if (!patternMatrix.ContainsKey(guess))
         {
             Debug.LogWarning($"Pattern cache miss for guess: {guess}");
-            return PatternMatcher.GetPatternDistribution(guess, possibleAnswers);
+            return -1f;
         }
 
         byte[] patterns = patternMatrix[guess];
+
+        // Count pattern occurrences using array (0-242)
+        int[] patternCounts = new int[243];
+        int totalCount = 0;
 
         foreach (string answer in possibleAnswers)
         {
             string upperAnswer = answer.ToUpper();
 
             if (!answerToIndex.ContainsKey(upperAnswer))
-            {
-                Debug.LogWarning($"Answer not in cache: {answer}");
                 continue;
-            }
 
             int answerIndex = answerToIndex[upperAnswer];
             int patternId = patterns[answerIndex];
 
-            if (!distribution.ContainsKey(patternId))
-                distribution[patternId] = new List<string>();
-
-            distribution[patternId].Add(answer);
+            patternCounts[patternId]++;
+            totalCount++;
         }
 
-        return distribution;
+        // Calculate entropy from counts
+        float entropy = 0f;
+        float totalCountFloat = (float)totalCount;
+
+        for (int i = 0; i < 243; i++)
+        {
+            if (patternCounts[i] > 0)
+            {
+                float p = patternCounts[i] / totalCountFloat;
+                entropy += p * Mathf.Log(1f / p, 2f);
+            }
+        }
+
+        return entropy;
     }
 
     public bool IsInitialized()
