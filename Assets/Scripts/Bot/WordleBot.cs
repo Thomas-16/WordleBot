@@ -20,18 +20,29 @@ public class WordleBot
 
     public string GetBestGuess()
     {
+        // Use concurrent dictionary for thread-safe parallel computation
+        ConcurrentDictionary<string, float> concurrentEntropies = new ConcurrentDictionary<string, float>();
+
+        // Calculate entropies in parallel
+        Parallel.ForEach(remainingPossibleWords, guess =>
+        {
+            float entropy = CalculateExpectedEntropy(guess);
+            concurrentEntropies[guess] = entropy;
+        });
+
+        // Transfer results to instance dictionary
+        wordEntropies = new Dictionary<string, float>(concurrentEntropies);
+
+        // Find best guess from results
         string bestGuess = "";
         float maxEntropy = 0;
 
-        foreach (string guess in remainingPossibleWords)
+        foreach (var kvp in wordEntropies)
         {
-            float entropy = CalculateExpectedEntropy(guess);
-            wordEntropies.Add(guess, entropy);
-
-            if (entropy > maxEntropy)
+            if (kvp.Value > maxEntropy)
             {
-                maxEntropy = entropy;
-                bestGuess = guess;
+                maxEntropy = kvp.Value;
+                bestGuess = kvp.Key;
             }
         }
 
