@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Create bot with cache
-        wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache);
+        wordleBot = new WordleBot(WordList.Instance.GetPossibleAnswers(), patternCache);
 
         Debug.Log($"Best guess: {wordleBot.GetBestGuess()}");
 
