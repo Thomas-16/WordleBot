@@ -436,8 +436,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WordList
   allValidWords: []
   possibleAnswers: []
-  totalValidWords: 0
-  totalPossibleAnswers: 0
 --- !u!4 &141739655
 Transform:
   m_ObjectHideFlags: 0
@@ -1661,6 +1659,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b081cc8666fa5444a74dfef353800be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  answer: 
 --- !u!4 &814067226
 Transform:
   m_ObjectHideFlags: 0
