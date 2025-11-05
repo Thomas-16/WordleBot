@@ -23,13 +23,14 @@ public class CachePrecomputer : MonoBehaviour
 
     /// <summary>
     /// Precomputes all patterns and saves to file
-    /// Takes 10-30 seconds depending on CPU
+    /// 13,000 x 13,000 = 169 million patterns (~169MB file)
+    /// Takes 1-3 minutes depending on CPU
     /// </summary>
     [ContextMenu("Precompute Cache")]
     public void PrecomputeCache()
     {
-        Debug.Log("Starting pattern cache precomputation...");
-        Debug.Log("This will take 10-30 seconds. Do not close Unity!");
+        Debug.Log("Starting pattern cache precomputation (13k x 13k)...");
+        Debug.Log("This will take 1-3 minutes. Do not close Unity!");
 
         PatternCache cache = new PatternCache();
 
@@ -40,17 +41,17 @@ public class CachePrecomputer : MonoBehaviour
             return;
         }
 
-        var allGuesses = WordList.Instance.GetAllValidWords();
-        var allAnswers = WordList.Instance.GetPossibleAnswers();
+        var allValidWords = WordList.Instance.GetAllValidWords();
 
-        if (allGuesses.Count == 0 || allAnswers.Count == 0)
+        if (allValidWords.Count == 0)
         {
-            Debug.LogError("Word lists are empty! Cannot precompute.");
+            Debug.LogError("Word list is empty! Cannot precompute.");
             return;
         }
 
-        // Precompute and save
-        cache.PrecomputeAndSave(allGuesses, allAnswers);
+        // Precompute 13k x 13k matrix (both guesses AND answers from all valid words)
+        Debug.Log($"Computing {allValidWords.Count} x {allValidWords.Count} = {allValidWords.Count * allValidWords.Count:N0} patterns");
+        cache.PrecomputeAndSave(allValidWords, allValidWords);
 
         Debug.Log("Precomputation complete! Cache file saved to StreamingAssets folder.");
         Debug.Log("You can now run the game and it will use the cached patterns.");

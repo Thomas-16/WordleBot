@@ -24,8 +24,8 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Run the CachePrecomputer script to generate the cache file.");
         }
 
-        // Create bot with cache
-        wordleBot = new WordleBot(WordList.Instance.GetPossibleAnswers(), patternCache);
+        // Create bot with cache - use all 13k valid words
+        wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache);
 
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
         Debug.Log($"Best guess: {wordleBot.GetBestGuess()}, time took: {sw.ElapsedMilliseconds} ms");
