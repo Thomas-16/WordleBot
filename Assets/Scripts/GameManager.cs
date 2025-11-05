@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private TopGuessesUI textGuessesUI;
+
     [SerializeField] private string answer;
 
     private WordleBot wordleBot;
@@ -32,12 +34,9 @@ public class GameManager : MonoBehaviour
         sw.Stop();
 
         Dictionary<string, float> wordEntropies = wordleBot.GetWordEntropies();
-        Debug.Log(wordEntropies.Count);
-        var top5Entropies = wordEntropies.OrderByDescending(x => x.Value).Take(5);
-        foreach (var item in top5Entropies)
-        {
-            Debug.Log($"{item.Key}: {item.Value}");
-        }
+        List<KeyValuePair<string, float>> topGuesses = wordEntropies.OrderByDescending(x => x.Value).Take(14).ToList();
+        textGuessesUI.DisplayGuesses(topGuesses);
+
     }
 
     void Update()

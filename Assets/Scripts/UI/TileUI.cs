@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Tile : MonoBehaviour
+public class TileUI : MonoBehaviour
 {
     private TextMeshProUGUI letterText;
     private Image background;
