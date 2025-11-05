@@ -22,15 +22,12 @@ public class InputManager : MonoBehaviour
         {
             foreach (KeyCode keyCode in Enum.GetValues(typeof(KeyCode)))
             {
-                if (Input.GetKeyDown(keyCode))
+                // Check if it's a letter key (A-Z)
+                if (Input.GetKeyDown(keyCode) && keyCode >= KeyCode.A && keyCode <= KeyCode.Z)
                 {
-                    // Check if it's a letter key (A-Z)
-                    if (keyCode >= KeyCode.A && keyCode <= KeyCode.Z)
-                    {
-                        char letter = keyCode.ToString()[0];
-                        OnLetterPressed?.Invoke(letter);
-                        return;
-                    }
+                    char letter = keyCode.ToString()[0];
+                    OnLetterPressed?.Invoke(letter);
+                    return;
                 }
             }
         }
