@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
         sw.Stop();
 
         Dictionary<string, float> wordEntropies = wordleBot.GetWordEntropies();
+        Debug.Log($"Possibilities: {wordEntropies.Count}");
         List<KeyValuePair<string, float>> topGuesses = wordEntropies.OrderByDescending(x => x.Value).Take(14).ToList();
         textGuessesUI.DisplayGuesses(topGuesses);
 

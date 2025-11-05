@@ -14,6 +14,13 @@ public class GuessResult
         results = new LetterResult[5];
     }
 
+    public GuessResult(string guess, LetterResult result1, LetterResult result2, LetterResult result3, LetterResult result4, LetterResult result5)
+    {
+        this.guess = guess;
+        this.results = new LetterResult[5] { result1, result2, result3, result4, result5 };
+        this.patternId = ToPatternId();
+    }
+
     /// <summary>
     /// Converts the result to a base-3 pattern integer (0-242)
     /// Used for bot entropy calculations
