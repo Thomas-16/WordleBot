@@ -217,10 +217,9 @@ public class PatternCache
 
         foreach (string answer in possibleAnswers)
         {
-            if (!answerToIndex.ContainsKey(answer))
+            if (!answerToIndex.TryGetValue(answer, out int answerIndex))
                 continue;
 
-            int answerIndex = answerToIndex[answer];
             int patternId = patterns[answerIndex];
 
             patternCounts[patternId]++;
