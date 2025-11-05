@@ -113,7 +113,7 @@ public class PatternCache
         int totalGuesses = orderedGuesses.Count;
         int answersCount = orderedAnswers.Count;
 
-        Debug.Log($"Precomputing {totalGuesses} × {answersCount} = {totalGuesses * answersCount:N0} patterns...");
+        Debug.Log($"Precomputing {totalGuesses} x {answersCount} = {totalGuesses * answersCount:N0} patterns...");
 
         var startTime = DateTime.Now;
 
