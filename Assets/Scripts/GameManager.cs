@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private TopGuessesUI textGuessesUI;
+    [SerializeField] private GridUI gridUI;
 
     [SerializeField] private string answer;
 
@@ -40,9 +41,42 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void Update()
+    void OnEnable()
     {
-        
+        InputManager.Instance.OnLetterPressed += HandleLetterKeyPressed;
+        InputManager.Instance.OnEnterPressed += HandleEnterPressed;
+        InputManager.Instance.OnDeletePressed += HandleDeletePressed;
+    }
+    void OnDisable()
+    {
+        InputManager.Instance.OnLetterPressed -= HandleLetterKeyPressed;
+        InputManager.Instance.OnEnterPressed -= HandleEnterPressed;
+        InputManager.Instance.OnDeletePressed -= HandleDeletePressed;
+    }
+
+    private void HandleLetterKeyPressed(char letter)
+    {
+        if (gridUI == null || gridUI.GetCurrentRowString().Length == 5) return;
+
+        gridUI.UpdateCurrentRow(gridUI.GetCurrentRowString() + letter);
+    }
+    private void HandleEnterPressed()
+    {
+        if (gridUI == null) return;
+
+        string guess = gridUI.GetCurrentRowString();
+
+        if (guess.Length < 5) return;
+
+        GuessResult guessResult = PatternMatcher.EvaluateGuess(guess, this.answer);
+        gridUI.ConfirmGuess(guessResult);
+
+        Debug.Log($"Confirmed guess: {guessResult}");
+    }
+    private void HandleDeletePressed()
+    {
+        if (gridUI == null) return;
+
     }
 
 }

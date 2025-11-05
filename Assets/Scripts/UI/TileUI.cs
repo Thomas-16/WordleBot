@@ -12,4 +12,25 @@ public class TileUI : MonoBehaviour
         letterText = GetComponentInChildren<TextMeshProUGUI>();
         background = GetComponent<Image>();
     }
+
+    public void SetLetter(char letter)
+    {
+        letterText.text = letter.ToString().ToUpper();
+    }
+
+    public void SetLetterResult(LetterResult result)
+    {
+        switch(result)
+        {
+            case LetterResult.Absent:
+                background.color = new Color32(122, 124, 126, 255);
+                break;
+            case LetterResult.Present:
+                background.color = new Color32(199, 181, 103, 255);
+                break;
+            case LetterResult.Correct:
+                background.color = new Color32(119, 177, 95, 255);
+                break;
+        }
+    }
 }

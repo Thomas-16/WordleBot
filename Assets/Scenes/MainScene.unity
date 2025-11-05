@@ -1948,6 +1948,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   textGuessesUI: {fileID: 1657554604}
+  gridUI: {fileID: 1603969684}
   answer: 
 --- !u!4 &814067226
 Transform:
@@ -3686,7 +3687,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abaecb6c67c8e12458c6c98d325a00a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridUI
-  rows: []
+  rowTransforms:
+  - {fileID: 1663935821}
+  - {fileID: 219259113}
+  - {fileID: 1225361717}
+  - {fileID: 1446840805}
+  - {fileID: 1012860493}
+  - {fileID: 133723266}
 --- !u!1001 &1638132241
 PrefabInstance:
   m_ObjectHideFlags: 0
