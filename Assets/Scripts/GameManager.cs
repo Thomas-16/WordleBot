@@ -27,7 +27,9 @@ public class GameManager : MonoBehaviour
         // Create bot with cache
         wordleBot = new WordleBot(WordList.Instance.GetPossibleAnswers(), patternCache);
 
-        Debug.Log($"Best guess: {wordleBot.GetBestGuess()}");
+        System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+        Debug.Log($"Best guess: {wordleBot.GetBestGuess()}, time took: {sw.ElapsedMilliseconds} ms");
+        sw.Stop();
 
         Dictionary<string, float> wordEntropies = wordleBot.GetWordEntropies();
         Debug.Log(wordEntropies.Count);
