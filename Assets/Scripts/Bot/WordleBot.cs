@@ -35,7 +35,7 @@ public class WordleBot
 
         // Find best guess from results
         string bestGuess = "";
-        float maxEntropy = 0;
+        float maxEntropy = -1;
 
         foreach (var kvp in wordEntropies)
         {

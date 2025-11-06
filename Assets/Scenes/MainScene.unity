@@ -3891,8 +3891,8 @@ MonoBehaviour:
   - {fileID: 1446840805}
   - {fileID: 1012860493}
   - {fileID: 133723266}
-  guessesInfoContainer: {fileID: 0}
-  guessActualInfoPrefab: {fileID: 0}
+  guessesInfoContainer: {fileID: 1160555155}
+  guessActualInfoPrefab: {fileID: 3530154404764575536, guid: 2a0ad985c9a10e04fb3a422d8d5001ea, type: 3}
 --- !u!1001 &1638132241
 PrefabInstance:
   m_ObjectHideFlags: 0
