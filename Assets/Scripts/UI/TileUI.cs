@@ -20,7 +20,7 @@ public class TileUI : MonoBehaviour
 
     public void SetLetterResult(LetterResult result)
     {
-        switch(result)
+        switch (result)
         {
             case LetterResult.Absent:
                 background.color = new Color32(122, 124, 126, 255);
@@ -32,5 +32,16 @@ public class TileUI : MonoBehaviour
                 background.color = new Color32(119, 177, 95, 255);
                 break;
         }
+    }
+
+    public void Reset()
+    {
+        letterText.text = " ";
+        background.color = Color.black;
+    }
+
+    public bool IsEmpty()
+    {
+        return string.IsNullOrEmpty(letterText.text.ToString().Trim());
     }
 }

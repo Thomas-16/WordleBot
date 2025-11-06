@@ -30,6 +30,11 @@ public class GameManager : MonoBehaviour
         // Create bot with cache - use all 13k valid words
         wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache);
 
+        GetAndDisplayBestGuesses();
+    }
+
+    private void GetAndDisplayBestGuesses()
+    {
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
         Debug.Log($"Best guess: {wordleBot.GetBestGuess()}, time took: {sw.ElapsedMilliseconds} ms");
         sw.Stop();
@@ -38,7 +43,46 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Possibilities: {wordEntropies.Count}");
         List<KeyValuePair<string, float>> topGuesses = wordEntropies.OrderByDescending(x => x.Value).Take(14).ToList();
         textGuessesUI.DisplayGuesses(topGuesses);
+    }
 
+    private void HandleLetterKeyPressed(char letter)
+    {
+        if (gridUI == null || gridUI.GridFilled || gridUI.HasWon || gridUI.GetCurrentRowString().Length == 5) return;
+
+        gridUI.UpdateCurrentRow(gridUI.GetCurrentRowString() + letter);
+    }
+    private void HandleEnterPressed()
+    {
+        if (gridUI == null || gridUI.GridFilled || gridUI.HasWon) return;
+
+        string guess = gridUI.GetCurrentRowString();
+
+        if (guess.Length < 5) return;
+
+        GuessResult guessResult = PatternMatcher.EvaluateGuess(guess, this.answer);
+        gridUI.ConfirmGuess(guessResult);
+
+        Debug.Log($"Confirmed guess: {guessResult}");
+
+        wordleBot.ProcessFeedback(guess, guessResult);
+        GetAndDisplayBestGuesses();
+    }
+    private void HandleDeletePressed()
+    {
+        if (gridUI == null || gridUI.GridFilled || gridUI.HasWon || gridUI.GetCurrentRowString().Length == 0) return;
+
+        gridUI.DeleteLetter();
+
+    }
+
+    public void OnResetButtonClicked()
+    {
+        gridUI.ResetEntireGrid();
+
+        answer = WordList.Instance.GetRandomAnswer();
+
+        wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache);
+        GetAndDisplayBestGuesses();
     }
 
     void OnEnable()
@@ -53,30 +97,4 @@ public class GameManager : MonoBehaviour
         InputManager.Instance.OnEnterPressed -= HandleEnterPressed;
         InputManager.Instance.OnDeletePressed -= HandleDeletePressed;
     }
-
-    private void HandleLetterKeyPressed(char letter)
-    {
-        if (gridUI == null || gridUI.GetCurrentRowString().Length == 5) return;
-
-        gridUI.UpdateCurrentRow(gridUI.GetCurrentRowString() + letter);
-    }
-    private void HandleEnterPressed()
-    {
-        if (gridUI == null) return;
-
-        string guess = gridUI.GetCurrentRowString();
-
-        if (guess.Length < 5) return;
-
-        GuessResult guessResult = PatternMatcher.EvaluateGuess(guess, this.answer);
-        gridUI.ConfirmGuess(guessResult);
-
-        Debug.Log($"Confirmed guess: {guessResult}");
-    }
-    private void HandleDeletePressed()
-    {
-        if (gridUI == null) return;
-
-    }
-
 }
