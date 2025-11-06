@@ -101,6 +101,7 @@ public class SimulationManager : MonoBehaviour
         LogFinalStatistics(totalTimer.Elapsed.TotalSeconds);
     }
 
+    // Simulate one game of Wordle
     private void SimulateGame(string answer)
     {
         answer = answer.ToUpper();
