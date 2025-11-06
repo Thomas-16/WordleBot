@@ -56,13 +56,20 @@ public class GameManager : MonoBehaviour
         if (gridUI == null || gridUI.GridFilled || gridUI.HasWon) return;
 
         string guess = gridUI.GetCurrentRowString();
-
         if (guess.Length < 5 || !WordList.Instance.IsValidWord(guess)) return;
 
         GuessResult guessResult = PatternMatcher.EvaluateGuess(guess, this.answer);
         gridUI.ConfirmGuess(guessResult);
 
+        // Calculate actual information gained from this guess
+        int possibilitiesBefore = wordleBot.GetRemainingPossibilitiesCount();
         wordleBot.ProcessFeedback(guess, guessResult);
+        int possibilitiesAfter = wordleBot.GetRemainingPossibilitiesCount();
+
+        // Information gained = log2(before / after) = log2(before) - log2(after)
+        float actualInformation = Mathf.Log(possibilitiesBefore, 2) - Mathf.Log(possibilitiesAfter, 2);
+        gridUI.AddGuessInfoDisplay(actualInformation);
+
         GetAndDisplayBestGuesses();
     }
     private void HandleDeletePressed()

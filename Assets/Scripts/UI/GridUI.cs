@@ -1,8 +1,12 @@
+using System;
+using TMPro;
 using UnityEngine;
 
 public class GridUI : MonoBehaviour
 {
     [SerializeField] private Transform[] rowTransforms;
+    [SerializeField] private Transform guessesInfoContainer;
+    [SerializeField] private TextMeshProUGUI guessActualInfoPrefab;
 
     private TileUI[,] tiles;
     private int currentRow = 0;
@@ -95,6 +99,12 @@ public class GridUI : MonoBehaviour
         currentRow = 0;
         GridFilled = false;
         HasWon = false;
+    }
+
+    public void AddGuessInfoDisplay(float info)
+    {
+        TextMeshProUGUI infoText = Instantiate(guessActualInfoPrefab, guessesInfoContainer);
+        infoText.text = $"{Math.Round(info, 2)} bits";
     }
 
     public string GetCurrentRowString() => currentRowString;

@@ -86,4 +86,6 @@ public class WordleBot
     }
 
     public Dictionary<string, float> GetWordEntropies() { return wordEntropies; }
+
+    public int GetRemainingPossibilitiesCount() { return remainingPossibleWords.Count; }
 }
