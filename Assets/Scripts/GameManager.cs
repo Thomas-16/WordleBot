@@ -57,12 +57,10 @@ public class GameManager : MonoBehaviour
 
         string guess = gridUI.GetCurrentRowString();
 
-        if (guess.Length < 5) return;
+        if (guess.Length < 5 || !WordList.Instance.IsValidWord(guess)) return;
 
         GuessResult guessResult = PatternMatcher.EvaluateGuess(guess, this.answer);
         gridUI.ConfirmGuess(guessResult);
-
-        Debug.Log($"Confirmed guess: {guessResult}");
 
         wordleBot.ProcessFeedback(guess, guessResult);
         GetAndDisplayBestGuesses();
