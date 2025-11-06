@@ -83,6 +83,7 @@ public class GameManager : MonoBehaviour
     public void OnResetButtonClicked()
     {
         gridUI.ResetEntireGrid();
+        gridUI.ClearGuessInfoContainer();
 
         answer = WordList.Instance.GetRandomAnswer();
 

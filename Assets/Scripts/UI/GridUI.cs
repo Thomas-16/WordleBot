@@ -106,6 +106,13 @@ public class GridUI : MonoBehaviour
         TextMeshProUGUI infoText = Instantiate(guessActualInfoPrefab, guessesInfoContainer);
         infoText.text = $"{Math.Round(info, 2)} bits";
     }
+    public void ClearGuessInfoContainer()
+    {
+        foreach (Transform child in guessesInfoContainer)
+        {
+            Destroy(child.gameObject);
+        }
+    }
 
     public string GetCurrentRowString() => currentRowString;
     public int GetCurrentRowIndex() => currentRow;
