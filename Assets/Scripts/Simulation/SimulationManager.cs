@@ -156,16 +156,17 @@ public class SimulationManager : MonoBehaviour
             }
 
             // Process feedback for next iteration
-            int remainingBefore = currentBot.GetRemainingPossibilitiesCount();
             currentBot.ProcessFeedback(guess, result);
-            int remainingAfter = currentBot.GetRemainingPossibilitiesCount();
+            int remainingPossibilities = currentBot.GetRemainingPossibilitiesCount();
 
             // Check if we have no remaining possibilities (shouldn't happen)
-            if (remainingAfter == 0)
+            if (remainingPossibilities == 0)
             {
                 break;
             }
         }
+
+        Debug.Log($"Answer: {answer}, Solved: {solved}, Guesses count: {currentGuessCount}");
 
         // Update statistics
         UpdateStatistics(solved, currentGuessCount);
