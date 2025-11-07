@@ -173,8 +173,6 @@ public class SimulationManager : MonoBehaviour
             }
         }
 
-        Debug.Log($"Answer: {answer}, Solved: {solved}, Guesses count: {currentGuessCount}");
-
         // Update statistics
         UpdateStatistics(solved, currentGuessCount);
     }

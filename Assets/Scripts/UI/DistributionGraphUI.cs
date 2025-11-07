@@ -8,8 +8,54 @@ public class DistributionGraphUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI statsText;
 
     [SerializeField] private RectTransform[] bars;
+    [SerializeField] private RectTransform[] barNumbers;
 
     void Start()
+    {
+        SimulationManager.Instance.OnSimulationComplete += SimulationCompleteHandler;
+
+        ResetUI();
+    }
+
+    void Update()
+    {
+        if (SimulationManager.Instance.IsRunning())
+        {
+            UpdateStatsText();
+            UpdateBarGraph();
+            UpdateBarNumbers();
+        }
+    }
+
+    private void UpdateBarNumbers()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            RectTransform numberTransform = barNumbers[i];
+            TextMeshProUGUI numberText = numberTransform.GetComponent<TextMeshProUGUI>();
+            int number = SimulationManager.Instance.GetSolveDistribution()[i + 1];
+
+            // Update number and visibility
+            numberText.text = number.ToString();
+            numberTransform.gameObject.SetActive(number != 0);
+
+            // Update position
+            numberTransform.anchoredPosition = new Vector2(numberTransform.anchoredPosition.x, -375 + bars[i].sizeDelta.y + 25);
+        }
+    }
+
+    private void UpdateBarGraph()
+    {
+        // Index 0 = failed, 1-6 = solved in N guesses
+        int[] solveDistribution = SimulationManager.Instance.GetSolveDistribution();
+
+        for (int i = 1; i < 7; i++)
+        {
+            bars[i - 1].sizeDelta = new Vector2(bars[i - 1].sizeDelta.x, solveDistribution[i] / (float)SimulationManager.Instance.GetGamesCompleted() * 750f);
+        }
+    }
+    
+    private void ResetUI ()
     {
         statsText.text =
                 $"Average Score: 0.00 \n" +
@@ -21,27 +67,9 @@ public class DistributionGraphUI : MonoBehaviour
         {
             bars[i - 1].sizeDelta = new Vector2(bars[i - 1].sizeDelta.x, 0);
         }
-
-        SimulationManager.Instance.OnSimulationComplete += SimulationCompleteHandler;
-    }
-
-    void Update()
-    {
-        if (SimulationManager.Instance.IsRunning())
+        for (int i = 0; i < bars.Length; i++)
         {
-            UpdateStatsText();
-            UpdateBarGraph();
-        }
-    }
-
-    private void UpdateBarGraph()
-    {
-        // Index 0 = failed, 1-6 = solved in N guesses
-        int[] solveDistribution = SimulationManager.Instance.GetSolveDistribution();
-
-        for(int i = 1; i < 7; i++)
-        {
-            bars[i - 1].sizeDelta = new Vector2(bars[i - 1].sizeDelta.x, solveDistribution[i] / (float)SimulationManager.Instance.GetGamesCompleted() * 750f);
+            barNumbers[i].gameObject.SetActive(false);
         }
     }
 
@@ -49,6 +77,7 @@ public class DistributionGraphUI : MonoBehaviour
     {
         UpdateStatsText();
         UpdateBarGraph();
+        UpdateBarNumbers();
     }
 
     private void UpdateStatsText()
