@@ -1,10 +1,13 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DistributionGraphUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI statsText;
+
+    [SerializeField] private RectTransform[] bars;
 
     void Start()
     {
@@ -14,6 +17,11 @@ public class DistributionGraphUI : MonoBehaviour
                 $"Progress: 0.0% \n" +
                 $"Winrate: 0.0%";
 
+        for (int i = 1; i < 7; i++)
+        {
+            bars[i - 1].sizeDelta = new Vector2(bars[i - 1].sizeDelta.x, 0);
+        }
+
         SimulationManager.Instance.OnSimulationComplete += SimulationCompleteHandler;
     }
 
@@ -22,12 +30,25 @@ public class DistributionGraphUI : MonoBehaviour
         if (SimulationManager.Instance.IsRunning())
         {
             UpdateStatsText();
+            UpdateBarGraph();
+        }
+    }
+
+    private void UpdateBarGraph()
+    {
+        // Index 0 = failed, 1-6 = solved in N guesses
+        int[] solveDistribution = SimulationManager.Instance.GetSolveDistribution();
+
+        for(int i = 1; i < 7; i++)
+        {
+            bars[i - 1].sizeDelta = new Vector2(bars[i - 1].sizeDelta.x, solveDistribution[i] / (float)SimulationManager.Instance.GetGamesCompleted() * 750f);
         }
     }
 
     private void SimulationCompleteHandler()
     {
         UpdateStatsText();
+        UpdateBarGraph();
     }
 
     private void UpdateStatsText()

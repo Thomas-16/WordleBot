@@ -105,9 +105,6 @@ public class SimulationManager : MonoBehaviour
         totalTimer.Stop();
         isRunning = false;
 
-        // Log final statistics
-        LogFinalStatistics(totalTimer.Elapsed.TotalSeconds);
-
         OnSimulationComplete?.Invoke();
     }
 
@@ -209,24 +206,6 @@ public class SimulationManager : MonoBehaviour
         solveDistribution = new int[7];
         currentGuesses = new List<string>();
         currentGuessCount = 0;
-    }
-
-    private void LogFinalStatistics(double totalSeconds)
-    {
-        Debug.Log("========== SIMULATION COMPLETE ==========");
-        Debug.Log($"Total games: {gamesCompleted}");
-        Debug.Log($"Wins: {wins} ({(float)wins / gamesCompleted * 100:F2}%)");
-        Debug.Log($"Losses: {losses} ({(float)losses / gamesCompleted * 100:F2}%)");
-        Debug.Log($"Average guesses: {(float)totalGuesses / gamesCompleted:F2}");
-        Debug.Log($"Total time: {totalSeconds:F2} seconds");
-        Debug.Log($"Average time per game: {totalSeconds / gamesCompleted * 1000:F2} ms");
-        Debug.Log("\nSolve Distribution:");
-        Debug.Log($"  Failed: {solveDistribution[0]} ({(float)solveDistribution[0] / gamesCompleted * 100:F2}%)");
-        for (int i = 1; i <= 6; i++)
-        {
-            Debug.Log($"  {i} guesses: {solveDistribution[i]} ({(float)solveDistribution[i] / gamesCompleted * 100:F2}%)");
-        }
-        Debug.Log("========================================");
     }
 
     // Public getters for UI to access statistics in real-time
