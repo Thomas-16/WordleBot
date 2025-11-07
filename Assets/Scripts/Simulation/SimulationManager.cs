@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,8 @@ using UnityEngine;
 /// </summary>
 public class SimulationManager : MonoBehaviour
 {
+    public static SimulationManager Instance { get; private set; }
+
     [Header("Settings")]
     [SerializeField] private string fixedFirstGuess = "TARES";
     [SerializeField] private float delayBetweenGames = 0f; // Delay in seconds between each game simulation
@@ -33,7 +36,12 @@ public class SimulationManager : MonoBehaviour
     private List<string> currentGuesses;
     private int currentGuessCount;
 
+    public Action OnSimulationComplete;
 
+    void Awake()
+    {
+        Instance = this;
+    }
 
     public void StartSimulation()
     {
@@ -99,6 +107,8 @@ public class SimulationManager : MonoBehaviour
 
         // Log final statistics
         LogFinalStatistics(totalTimer.Elapsed.TotalSeconds);
+
+        OnSimulationComplete?.Invoke();
     }
 
     // Simulate one game of Wordle
@@ -221,7 +231,7 @@ public class SimulationManager : MonoBehaviour
 
     // Public getters for UI to access statistics in real-time
     public bool IsRunning() => isRunning;
-    public int GetCurrentGameIndex() => currentGameIndex;
+    public int GetCurrentGameNum() => currentGameIndex + 1;
     public int GetTotalGames() => totalGames;
     public float GetProgress() => totalGames > 0 ? (float)currentGameIndex / totalGames : 0f;
     public int GetGamesCompleted() => gamesCompleted;
