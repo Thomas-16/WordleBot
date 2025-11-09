@@ -1,12 +1,20 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class GridUI : MonoBehaviour
 {
     [SerializeField] private Transform[] rowTransforms;
     [SerializeField] private Transform guessesInfoContainer;
     [SerializeField] private TextMeshProUGUI guessActualInfoPrefab;
+    [SerializeField] private GraphicRaycaster raycaster;
+
+
+    [SerializeField] private bool allowClickSwitching;
 
     private TileUI[,] tiles;
     private int currentRow = 0;
@@ -17,6 +25,61 @@ public class GridUI : MonoBehaviour
     void Awake()
     {
         ResetEntireGrid();
+    }
+
+    void Update()
+    {
+        if (!allowClickSwitching) return;
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        if (!EventSystem.current || !EventSystem.current.IsPointerOverGameObject()) return;
+
+        TileUI targetTile = RaycastTileUnderMouse();
+        if (!targetTile) return;
+
+        int tileRow = -1;
+
+        for (int r = 0; r < tiles.GetLength(0); r++)
+        {
+            for (int c = 0; c < tiles.GetLength(1); c++)
+            {
+                if (tiles[r, c] == targetTile)
+                {
+                    tileRow = r;
+                    break;
+                }
+            }
+            if (tileRow != -1) break;
+        }
+
+        if (tileRow != currentRow) return;
+
+        switch (targetTile.State)
+        {
+            case TileUI.TileState.Empty:
+                targetTile.SetTileState(TileUI.TileState.Grey); break;
+            case TileUI.TileState.Grey:
+                targetTile.SetTileState(TileUI.TileState.Yellow); break;
+            case TileUI.TileState.Yellow:
+                targetTile.SetTileState(TileUI.TileState.Green); break;
+            case TileUI.TileState.Green:
+                targetTile.SetTileState(TileUI.TileState.Empty); break;
+        }
+    }
+
+    TileUI RaycastTileUnderMouse()
+    {
+        var ped = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
+        var results = new List<RaycastResult>();
+        raycaster.Raycast(ped, results);
+
+        foreach (var r in results)
+        {
+            // Your tiles might be on a child; search up the hierarchy.
+            var tile = r.gameObject.GetComponentInParent<TileUI>();
+            if (tile) return tile;
+        }
+        return null;
     }
 
     public void UpdateCurrentRow(string input)
@@ -116,4 +179,11 @@ public class GridUI : MonoBehaviour
 
     public string GetCurrentRowString() => currentRowString;
     public int GetCurrentRowIndex() => currentRow;
+
+    public TileUI[] GetCurrentRowTile()
+    {
+        return Enumerable.Range(0, tiles.GetLength(1))
+                              .Select(c => tiles[currentRow, c])
+                              .ToArray();
+    }
 }
