@@ -21,6 +21,7 @@ public class SimulationManager : MonoBehaviour
     [SerializeField] private int totalGames = 0;
 
     private PatternCache patternCache;
+    private WordFrequencyModel frequencyModel;
     private List<string> allPossibleAnswers;
 
     // Statistics tracking
@@ -60,6 +61,11 @@ public class SimulationManager : MonoBehaviour
             Debug.LogError("Pattern cache not loaded! Cannot run simulation without cache.");
             return;
         }
+
+        // Initialize word frequency model
+        List<string> sortedWords = WordList.Instance.GetAllValidWordsSorted();
+        frequencyModel = new WordFrequencyModel(sortedWords);
+        Debug.Log("Simulation: Word frequency model initialized");
 
         // Get all possible answers (the 2300 curated list)
         allPossibleAnswers = WordList.Instance.GetPossibleAnswers();
@@ -113,8 +119,8 @@ public class SimulationManager : MonoBehaviour
     {
         answer = answer.ToUpper();
 
-        // Create new bot for this game
-        currentBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache);
+        // Create new bot for this game with frequency model
+        currentBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache, frequencyModel);
         currentGuesses = new List<string>();
         currentGuessCount = 0;
 

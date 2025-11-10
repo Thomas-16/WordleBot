@@ -9,13 +9,32 @@ public class WordleBot
     private List<string> remainingPossibleWords;
     private Dictionary<string, float> wordEntropies;
     private PatternCache patternCache;
+    private WordFrequencyModel frequencyModel;
+    private Dictionary<string, float> currentProbabilities;
 
 
-    public WordleBot(List<string> possibleWords, PatternCache cache = null)
+    public WordleBot(List<string> possibleWords, PatternCache cache = null, WordFrequencyModel freqModel = null)
     {
         this.remainingPossibleWords = possibleWords;
         this.wordEntropies = new Dictionary<string, float>();
         this.patternCache = cache;
+        this.frequencyModel = freqModel;
+
+        // Initialize probabilities (normalized for current word set)
+        if (frequencyModel != null)
+        {
+            currentProbabilities = frequencyModel.GetNormalizedProbabilities(possibleWords);
+        }
+        else
+        {
+            // Fallback to uniform probabilities
+            currentProbabilities = new Dictionary<string, float>();
+            float uniformProb = 1f / possibleWords.Count;
+            foreach (string word in possibleWords)
+            {
+                currentProbabilities[word] = uniformProb;
+            }
+        }
     }
 
     public string GetBestGuess()
@@ -51,13 +70,13 @@ public class WordleBot
 
     public float CalculateExpectedEntropy(string guess)
     {
-        // Use direct entropy calculation from cache (avoids building distribution dictionary)
+        // Use direct entropy calculation from cache with probabilities
         if (patternCache != null && patternCache.IsInitialized())
         {
-            return patternCache.CalculateEntropy(guess, remainingPossibleWords);
+            return patternCache.CalculateEntropy(guess, remainingPossibleWords, currentProbabilities);
         }
 
-        // Fallback: build distribution and calculate manually
+        // Fallback: build distribution and calculate manually with probability weighting
         Dictionary<int, List<string>> patterns = PatternMatcher.GetPatternDistribution(guess, remainingPossibleWords);
 
         float sum = 0;
@@ -66,9 +85,22 @@ public class WordleBot
             int patternId = pattern.Key;
             List<string> possibleAnswers = pattern.Value;
 
-            float p = (float)possibleAnswers.Count / remainingPossibleWords.Count;
+            // Calculate probability of this pattern (sum of word probabilities in this bucket)
+            float patternProbability = 0f;
+            foreach (string answer in possibleAnswers)
+            {
+                if (currentProbabilities.TryGetValue(answer, out float prob))
+                {
+                    patternProbability += prob;
+                }
+            }
 
-            sum += p * Mathf.Log(1 / p, 2);
+            // Skip patterns with zero probability
+            if (patternProbability > 0f)
+            {
+                // Entropy contribution: p * log2(1/p)
+                sum += patternProbability * Mathf.Log(1f / patternProbability, 2);
+            }
         }
 
         return sum;
@@ -80,6 +112,22 @@ public class WordleBot
         remainingPossibleWords = PatternMatcher.FilterByPattern(
             remainingPossibleWords, guess, result
         );
+
+        // Renormalize probabilities for the new filtered set
+        if (frequencyModel != null)
+        {
+            currentProbabilities = frequencyModel.GetNormalizedProbabilities(remainingPossibleWords);
+        }
+        else
+        {
+            // Update uniform probabilities
+            currentProbabilities.Clear();
+            float uniformProb = 1f / remainingPossibleWords.Count;
+            foreach (string word in remainingPossibleWords)
+            {
+                currentProbabilities[word] = uniformProb;
+            }
+        }
 
         // Clear entropy cache since possibilities changed
         wordEntropies.Clear();

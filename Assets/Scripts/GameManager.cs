@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 
     private WordleBot wordleBot;
     private PatternCache patternCache;
+    private WordFrequencyModel frequencyModel;
 
     void Start()
     {
@@ -27,8 +28,14 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Run the CachePrecomputer script to generate the cache file.");
         }
 
-        // Create bot with cache - use all 13k valid words
-        wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache);
+        // Initialize word frequency model with sorted word list
+        List<string> sortedWords = WordList.Instance.GetAllValidWordsSorted();
+        frequencyModel = new WordFrequencyModel(sortedWords);
+        Debug.Log("Word frequency model initialized");
+        Debug.Log(frequencyModel.GetDiagnostics());
+
+        // Create bot with cache and frequency model - use all 13k valid words
+        wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache, frequencyModel);
 
         GetAndDisplayBestGuesses();
     }
@@ -87,7 +94,7 @@ public class GameManager : MonoBehaviour
 
         answer = WordList.Instance.GetRandomAnswer();
 
-        wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache);
+        wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache, frequencyModel);
         GetAndDisplayBestGuesses();
     }
 

@@ -200,8 +200,9 @@ public class PatternCache
     /// <summary>
     /// Calculate entropy directly from cached patterns - avoids building distribution dictionary
     /// Should be much faster than GetPatternDistribution + manual calculation
+    /// Now supports probability-weighted entropy calculation
     /// </summary>
-    public float CalculateEntropy(string guess, List<string> possibleAnswers)
+    public float CalculateEntropy(string guess, List<string> possibleAnswers, Dictionary<string, float> wordProbabilities = null)
     {
         if (!patternMatrix.ContainsKey(guess))
         {
@@ -211,35 +212,72 @@ public class PatternCache
 
         byte[] patterns = patternMatrix[guess];
 
-        // Count pattern occurrences using array (0-242)
-        int[] patternCounts = new int[243];
-        int totalCount = 0;
-
-        foreach (string answer in possibleAnswers)
+        // Use probability sums instead of counts if probabilities are provided
+        if (wordProbabilities != null)
         {
-            if (!answerToIndex.TryGetValue(answer, out int answerIndex))
-                continue;
+            // Sum probabilities for each pattern (0-242)
+            float[] patternProbabilities = new float[243];
 
-            int patternId = patterns[answerIndex];
-
-            patternCounts[patternId]++;
-            totalCount++;
-        }
-
-        // Calculate entropy from counts
-        float entropy = 0f;
-        float totalCountFloat = (float)totalCount;
-
-        for (int i = 0; i < 243; i++)
-        {
-            if (patternCounts[i] > 0)
+            foreach (string answer in possibleAnswers)
             {
-                float p = patternCounts[i] / totalCountFloat;
-                entropy += p * Mathf.Log(1f / p, 2f);
-            }
-        }
+                if (!answerToIndex.TryGetValue(answer, out int answerIndex))
+                    continue;
 
-        return entropy;
+                int patternId = patterns[answerIndex];
+
+                // Add this word's probability to the pattern bucket
+                if (wordProbabilities.TryGetValue(answer, out float prob))
+                {
+                    patternProbabilities[patternId] += prob;
+                }
+            }
+
+            // Calculate entropy from probability sums
+            float entropy = 0f;
+
+            for (int i = 0; i < 243; i++)
+            {
+                if (patternProbabilities[i] > 0f)
+                {
+                    float p = patternProbabilities[i];
+                    entropy += p * Mathf.Log(1f / p, 2f);
+                }
+            }
+
+            return entropy;
+        }
+        else
+        {
+            // Fallback: uniform probability (original implementation)
+            int[] patternCounts = new int[243];
+            int totalCount = 0;
+
+            foreach (string answer in possibleAnswers)
+            {
+                if (!answerToIndex.TryGetValue(answer, out int answerIndex))
+                    continue;
+
+                int patternId = patterns[answerIndex];
+
+                patternCounts[patternId]++;
+                totalCount++;
+            }
+
+            // Calculate entropy from counts
+            float entropy = 0f;
+            float totalCountFloat = (float)totalCount;
+
+            for (int i = 0; i < 243; i++)
+            {
+                if (patternCounts[i] > 0)
+                {
+                    float p = patternCounts[i] / totalCountFloat;
+                    entropy += p * Mathf.Log(1f / p, 2f);
+                }
+            }
+
+            return entropy;
+        }
     }
 
     public bool IsInitialized()
