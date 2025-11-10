@@ -5,6 +5,7 @@ public class WordDataLoader : MonoBehaviour
 {
     // Paths to word list files in Resources folder
     [SerializeField] private string allWordsPath = "all_words";
+    [SerializeField] private string allWordsSortedPath = "all_words_sorted";
     [SerializeField] private string possibleWordsPath = "possible_wordle_words";
 
 
@@ -50,6 +51,13 @@ public class WordDataLoader : MonoBehaviour
     public List<string> LoadAllWords()
     {
         return LoadWordList(allWordsPath);
+    }
+    /// <summary>
+    /// Loads all valid words that can be guessed sorted from most frequent to least
+    /// </summary>
+    public List<string> LoadAllWordsSorted()
+    {
+        return LoadWordList(allWordsSortedPath);
     }
 
     /// <summary>

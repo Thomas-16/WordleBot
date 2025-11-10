@@ -8,12 +8,12 @@ public class WordList : MonoBehaviour
 
     [Header("Word Lists")]
     [SerializeField] private List<string> allValidWords = new List<string>();
+    [SerializeField] private List<string> allValidWordsSorted = new List<string>();
     [SerializeField] private List<string> possibleAnswers = new List<string>();
 
 
     private WordDataLoader dataLoader;
     private HashSet<string> validWordSet; // For fast lookup
-    private HashSet<string> answerWordSet; // For fast lookup
 
     private void Awake()
     {
@@ -31,26 +31,30 @@ public class WordList : MonoBehaviour
     {
         // Load the word lists
         allValidWords = dataLoader.LoadAllWords();
+        allValidWordsSorted = dataLoader.LoadAllWordsSorted();
         possibleAnswers = dataLoader.LoadPossibleWords();
 
         // Create HashSets for O(1) lookup performance
         validWordSet = new HashSet<string>(allValidWords);
-        answerWordSet = new HashSet<string>(possibleAnswers);
 
         int totalValidWords = allValidWords.Count;
+        int totalValidWordsSorted = allValidWordsSorted.Count;
         int totalPossibleAnswers = possibleAnswers.Count;
 
         if (totalValidWords == 0)
         {
             Debug.LogError("No valid words loaded!");
         }
-
+        if (totalValidWordsSorted == 0)
+        {
+            Debug.LogError("No valid words sorted loaded!");
+        }
         if (totalPossibleAnswers == 0)
         {
             Debug.LogError("No possible answers loaded!");
         }
 
-        Debug.Log($"WordList initialized: {totalValidWords} valid words, {totalPossibleAnswers} possible answers");
+        Debug.Log($"WordList initialized: {totalValidWords} valid words, {totalValidWordsSorted} valid sorted words, {totalPossibleAnswers} possible answers");
     }
 
     /// <summary>
@@ -63,20 +67,19 @@ public class WordList : MonoBehaviour
     }
 
     /// <summary>
-    /// Checks if a word could be the answer
-    /// </summary>
-    public bool IsPossibleAnswer(string word)
-    {
-        if (string.IsNullOrEmpty(word)) return false;
-        return answerWordSet.Contains(word);
-    }
-
-    /// <summary>
     /// Gets all valid words (for bot calculations)
     /// </summary>
     public List<string> GetAllValidWords()
     {
         return new List<string>(allValidWords);
+    }
+
+    /// <summary>
+    /// Gets all valid words sorted (for bot calculations)
+    /// </summary>
+    public List<string> GetAllValidWordsSorted()
+    {
+        return new List<string>(allValidWordsSorted);
     }
 
     /// <summary>
