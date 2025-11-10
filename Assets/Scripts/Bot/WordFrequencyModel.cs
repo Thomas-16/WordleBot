@@ -9,15 +9,30 @@ public class WordFrequencyModel
 {
     private Dictionary<string, float> wordProbabilities;
 
-    private const float SIGMOID_MIDPOINT = 0.5f;  // Point where probability = 0.5
-    private const float SIGMOID_STEEPNESS = 10f;  // Controls transition sharpness
+    // Sigmoid parameters (configurable)
+    private float sigmoidMidpoint;
+    private float sigmoidSteepness;
+
+    private const float BEST_SIGMOID_MIDPOINT = 0.625f;
+    private const float BEST_SIGMOID_STEEPNESS = 16f;
 
     /// <summary>
     /// Creates a frequency model from a frequency-sorted word list.
     /// Words should be sorted from most to least frequent.
     /// </summary>
+    /// 
     public WordFrequencyModel(List<string> frequencySortedWords)
     {
+        this.sigmoidMidpoint = BEST_SIGMOID_MIDPOINT;
+        this.sigmoidSteepness = BEST_SIGMOID_STEEPNESS;
+        wordProbabilities = new Dictionary<string, float>();
+        AssignProbabilities(frequencySortedWords);
+    }
+    
+    public WordFrequencyModel(List<string> frequencySortedWords, float midpoint = 0.5f, float steepness = 10f)
+    {
+        this.sigmoidMidpoint = midpoint;
+        this.sigmoidSteepness = steepness;
         wordProbabilities = new Dictionary<string, float>();
         AssignProbabilities(frequencySortedWords);
     }
@@ -71,10 +86,10 @@ public class WordFrequencyModel
         float invertedPosition = 1f - normalizedPosition;
 
         // Shift and scale around midpoint
-        float x = invertedPosition - SIGMOID_MIDPOINT;
+        float x = invertedPosition - sigmoidMidpoint;
 
         // Apply sigmoid
-        float result = 1f / (1f + Mathf.Exp(-SIGMOID_STEEPNESS * x));
+        float result = 1f / (1f + Mathf.Exp(-sigmoidSteepness * x));
 
         return result;
     }
