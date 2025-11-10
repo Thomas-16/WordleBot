@@ -159,31 +159,4 @@ public class WordFrequencyModel
         }
         return sum;
     }
-
-    /// <summary>
-    /// Gets diagnostic information about the probability distribution.
-    /// </summary>
-    public string GetDiagnostics()
-    {
-        float totalProb = GetTotalProbability();
-        int wordCount = wordProbabilities.Count;
-
-        // Find min/max probabilities
-        float minProb = float.MaxValue;
-        float maxProb = float.MinValue;
-
-        foreach (float prob in wordProbabilities.Values)
-        {
-            if (prob < minProb) minProb = prob;
-            if (prob > maxProb) maxProb = prob;
-        }
-
-        return $"WordFrequencyModel Diagnostics:\n" +
-               $"  Total words: {wordCount}\n" +
-               $"  Probability sum: {totalProb:F6}\n" +
-               $"  Min probability: {minProb:E4}\n" +
-               $"  Max probability: {maxProb:E4}\n" +
-               $"  Sigmoid midpoint: {SIGMOID_MIDPOINT}\n" +
-               $"  Sigmoid steepness: {SIGMOID_STEEPNESS}";
-    }
 }

@@ -32,7 +32,6 @@ public class GameManager : MonoBehaviour
         List<string> sortedWords = WordList.Instance.GetAllValidWordsSorted();
         frequencyModel = new WordFrequencyModel(sortedWords);
         Debug.Log("Word frequency model initialized");
-        Debug.Log(frequencyModel.GetDiagnostics());
 
         // Create bot with cache and frequency model - use all 13k valid words
         wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache, frequencyModel);
