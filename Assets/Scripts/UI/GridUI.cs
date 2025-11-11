@@ -22,7 +22,7 @@ public class GridUI : MonoBehaviour
     public bool GridFilled { get; private set; }
     public bool HasWon { get; private set; }
 
-    void Awake()
+    void Start()
     {
         ResetEntireGrid();
     }
