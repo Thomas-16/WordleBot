@@ -633,7 +633,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 275744374}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1951785636}
+        m_TargetAssemblyTypeName: SuggestionModeManager, Assembly-CSharp
+        m_MethodName: OnResetButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &275744374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4296,6 +4308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WordDataLoader
   allWordsPath: all_words
+  allWordsSortedPath: all_words_sorted
   possibleWordsPath: possible_wordle_words
 --- !u!114 &1949658287
 MonoBehaviour:
@@ -4310,6 +4323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WordList
   allValidWords: []
+  allValidWordsSorted: []
   possibleAnswers: []
 --- !u!4 &1949658288
 Transform:
