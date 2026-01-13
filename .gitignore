@@ -75,5 +75,5 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Pattern cache
-Assets/StreamingAssets/pattern_cache.bytes
-Assets/StreamingAssets/pattern_cache.bytes.meta
+*.bytes
+*.bytes.meta
