@@ -41,6 +41,15 @@ public class WordleBot
 
     public string GetBestGuess()
     {
+#if UNITY_WEBGL
+        // Sequential for WebGL (single-threaded)
+        wordEntropies.Clear();
+        foreach (string guess in remainingPossibleWords)
+        {
+            float entropy = CalculateExpectedEntropy(guess);
+            wordEntropies[guess] = entropy;
+        }
+#else
         // Use concurrent dictionary for thread-safe parallel computation
         ConcurrentDictionary<string, float> concurrentEntropies = new ConcurrentDictionary<string, float>();
 
@@ -53,6 +62,7 @@ public class WordleBot
 
         // Transfer results to instance dictionary
         wordEntropies = new Dictionary<string, float>(concurrentEntropies);
+#endif
 
         // Find best guess from results
         string bestGuess = "";

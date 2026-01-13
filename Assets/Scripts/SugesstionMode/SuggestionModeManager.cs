@@ -17,6 +17,36 @@ public class SuggestionModeManager : MonoBehaviour
     private InitialGuessesCache initialGuessesCache;
 
 
+#if UNITY_WEBGL
+    IEnumerator Start()
+    {
+        // Initialize pattern cache (async for WebGL)
+        patternCache = new PatternCache();
+        bool cacheLoaded = false;
+        yield return patternCache.LoadFromFileAsync(result => cacheLoaded = result);
+
+        if (!cacheLoaded)
+        {
+            Debug.LogWarning("Pattern cache not found. Bot will run slower without precomputed patterns.");
+        }
+
+        // Load initial guesses cache (async for WebGL)
+        initialGuessesCache = new InitialGuessesCache();
+        yield return initialGuessesCache.LoadFromFileAsync(_ => { });
+
+        // Initialize word frequency model with sorted word list
+        List<string> sortedWords = WordList.Instance.GetAllValidWordsSorted();
+        frequencyModel = new WordFrequencyModel(sortedWords);
+        Debug.Log("Word frequency model initialized");
+
+        // Create bot with cache and frequency model - use all 13k valid words
+        wordleBot = new WordleBot(WordList.Instance.GetAllValidWords(), patternCache, frequencyModel);
+
+        GetAndDisplayBestGuesses();
+
+        warningText.SetActive(false);
+    }
+#else
     void Start()
     {
         // Initialize pattern cache (loads from file if available)
@@ -45,6 +75,7 @@ public class SuggestionModeManager : MonoBehaviour
 
         warningText.SetActive(false);
     }
+#endif
 
     private void GetAndDisplayBestGuesses()
     {

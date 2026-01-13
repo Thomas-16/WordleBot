@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 
 /// <summary>
 /// Precomputes and caches all pattern IDs for instant lookup
@@ -22,6 +24,10 @@ public class PatternCache
     // Ordered lists (must match file order)
     private List<string> orderedGuesses;
     private List<string> orderedAnswers;
+
+    // Reusable arrays for entropy calculation (avoid GC allocation)
+    private float[] patternProbabilitiesBuffer = new float[243];
+    private int[] patternCountsBuffer = new int[243];
 
     public PatternCache()
     {
@@ -215,8 +221,8 @@ public class PatternCache
         // Use probability sums instead of counts if probabilities are provided
         if (wordProbabilities != null)
         {
-            // Sum probabilities for each pattern (0-242)
-            float[] patternProbabilities = new float[243];
+            // Clear and reuse buffer array
+            Array.Clear(patternProbabilitiesBuffer, 0, 243);
 
             foreach (string answer in possibleAnswers)
             {
@@ -228,7 +234,7 @@ public class PatternCache
                 // Add this word's probability to the pattern bucket
                 if (wordProbabilities.TryGetValue(answer, out float prob))
                 {
-                    patternProbabilities[patternId] += prob;
+                    patternProbabilitiesBuffer[patternId] += prob;
                 }
             }
 
@@ -237,9 +243,9 @@ public class PatternCache
 
             for (int i = 0; i < 243; i++)
             {
-                if (patternProbabilities[i] > 0f)
+                if (patternProbabilitiesBuffer[i] > 0f)
                 {
-                    float p = patternProbabilities[i];
+                    float p = patternProbabilitiesBuffer[i];
                     entropy += p * Mathf.Log(1f / p, 2f);
                 }
             }
@@ -249,7 +255,7 @@ public class PatternCache
         else
         {
             // Fallback: uniform probability (original implementation)
-            int[] patternCounts = new int[243];
+            Array.Clear(patternCountsBuffer, 0, 243);
             int totalCount = 0;
 
             foreach (string answer in possibleAnswers)
@@ -259,7 +265,7 @@ public class PatternCache
 
                 int patternId = patterns[answerIndex];
 
-                patternCounts[patternId]++;
+                patternCountsBuffer[patternId]++;
                 totalCount++;
             }
 
@@ -269,9 +275,9 @@ public class PatternCache
 
             for (int i = 0; i < 243; i++)
             {
-                if (patternCounts[i] > 0)
+                if (patternCountsBuffer[i] > 0)
                 {
-                    float p = patternCounts[i] / totalCountFloat;
+                    float p = patternCountsBuffer[i] / totalCountFloat;
                     entropy += p * Mathf.Log(1f / p, 2f);
                 }
             }
@@ -284,4 +290,78 @@ public class PatternCache
     {
         return patternMatrix.Count > 0;
     }
+
+#if UNITY_WEBGL
+    /// <summary>
+    /// Async loading for WebGL using UnityWebRequest
+    /// </summary>
+    public IEnumerator LoadFromFileAsync(System.Action<bool> onComplete)
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, CACHE_FILENAME);
+
+        using (UnityWebRequest request = UnityWebRequest.Get(path))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                try
+                {
+                    LoadFromBytes(request.downloadHandler.data);
+                    Debug.Log($"Pattern cache loaded (WebGL): {orderedGuesses.Count} guesses x {orderedAnswers.Count} answers");
+                    onComplete(true);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to parse pattern cache: {e.Message}");
+                    onComplete(false);
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Pattern cache not found at: {path}");
+                onComplete(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Parse binary data from byte array (for WebGL)
+    /// </summary>
+    private void LoadFromBytes(byte[] data)
+    {
+        using (MemoryStream stream = new MemoryStream(data))
+        using (BinaryReader reader = new BinaryReader(stream))
+        {
+            // Read header
+            int guessCount = reader.ReadInt32();
+            int answerCount = reader.ReadInt32();
+
+            // Read guess list
+            orderedGuesses = new List<string>(guessCount);
+            for (int i = 0; i < guessCount; i++)
+            {
+                orderedGuesses.Add(reader.ReadString());
+            }
+
+            // Read answer list and build index
+            orderedAnswers = new List<string>(answerCount);
+            answerToIndex = new Dictionary<string, int>(answerCount);
+            for (int i = 0; i < answerCount; i++)
+            {
+                string answer = reader.ReadString();
+                orderedAnswers.Add(answer);
+                answerToIndex[answer] = i;
+            }
+
+            // Read pattern matrix
+            patternMatrix = new Dictionary<string, byte[]>(guessCount);
+            for (int i = 0; i < guessCount; i++)
+            {
+                byte[] patterns = reader.ReadBytes(answerCount);
+                patternMatrix[orderedGuesses[i]] = patterns;
+            }
+        }
+    }
+#endif
 }

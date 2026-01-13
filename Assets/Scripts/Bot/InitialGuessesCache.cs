@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class InitialGuessesCache
 {
@@ -94,4 +96,59 @@ public class InitialGuessesCache
         }
         return dict;
     }
+
+#if UNITY_WEBGL
+    /// <summary>
+    /// Async loading for WebGL using UnityWebRequest
+    /// </summary>
+    public IEnumerator LoadFromFileAsync(System.Action<bool> onComplete)
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, CACHE_FILENAME);
+
+        using (UnityWebRequest request = UnityWebRequest.Get(path))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                try
+                {
+                    LoadFromBytes(request.downloadHandler.data);
+                    Debug.Log($"Initial guesses cache loaded (WebGL): {cachedGuesses.Count} entries, best: {cachedGuesses[0].Key}");
+                    onComplete(true);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to parse initial guesses cache: {e.Message}");
+                    onComplete(false);
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Initial guesses cache not found at: {path}");
+                onComplete(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Parse binary data from byte array (for WebGL)
+    /// </summary>
+    private void LoadFromBytes(byte[] data)
+    {
+        using (MemoryStream stream = new MemoryStream(data))
+        using (BinaryReader reader = new BinaryReader(stream))
+        {
+            int count = reader.ReadInt32();
+            cachedGuesses = new List<KeyValuePair<string, float>>(count);
+
+            for (int i = 0; i < count; i++)
+            {
+                string word = reader.ReadString();
+                float entropy = reader.ReadSingle();
+                cachedGuesses.Add(new KeyValuePair<string, float>(word, entropy));
+            }
+        }
+    }
+#endif
 }
