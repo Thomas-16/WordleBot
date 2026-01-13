@@ -98,14 +98,15 @@ public class InitialGuessesCache
     }
 
 #if UNITY_WEBGL
+    // GitHub Releases URL (LFS doesn't work on GitHub Pages)
+    private const string WEBGL_CACHE_URL = "https://github.com/Thomas-16/WordleBot/releases/download/cache2/initial_guesses_cache.bytes";
+
     /// <summary>
     /// Async loading for WebGL using UnityWebRequest
     /// </summary>
     public IEnumerator LoadFromFileAsync(System.Action<bool> onComplete)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, CACHE_FILENAME);
-
-        using (UnityWebRequest request = UnityWebRequest.Get(path))
+        using (UnityWebRequest request = UnityWebRequest.Get(WEBGL_CACHE_URL))
         {
             yield return request.SendWebRequest();
 
@@ -125,7 +126,7 @@ public class InitialGuessesCache
             }
             else
             {
-                Debug.LogWarning($"Initial guesses cache not found at: {path}");
+                Debug.LogWarning($"Initial guesses cache failed to load from: {WEBGL_CACHE_URL} - {request.error}");
                 onComplete(false);
             }
         }

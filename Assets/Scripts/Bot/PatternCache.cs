@@ -292,14 +292,15 @@ public class PatternCache
     }
 
 #if UNITY_WEBGL
+    // GitHub Releases URL for pattern cache (too large for regular Git, needs LFS which doesn't work on GitHub Pages)
+    private const string WEBGL_CACHE_URL = "https://github.com/Thomas-16/WordleBot/releases/download/cache/pattern_cache.bytes";
+
     /// <summary>
     /// Async loading for WebGL using UnityWebRequest
     /// </summary>
     public IEnumerator LoadFromFileAsync(System.Action<bool> onComplete)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, CACHE_FILENAME);
-
-        using (UnityWebRequest request = UnityWebRequest.Get(path))
+        using (UnityWebRequest request = UnityWebRequest.Get(WEBGL_CACHE_URL))
         {
             yield return request.SendWebRequest();
 
@@ -319,7 +320,7 @@ public class PatternCache
             }
             else
             {
-                Debug.LogWarning($"Pattern cache not found at: {path}");
+                Debug.LogWarning($"Pattern cache failed to load from: {WEBGL_CACHE_URL} - {request.error}");
                 onComplete(false);
             }
         }
