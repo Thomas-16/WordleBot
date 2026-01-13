@@ -292,8 +292,8 @@ public class PatternCache
     }
 
 #if UNITY_WEBGL
-    // GitHub Releases URL for pattern cache (too large for regular Git, needs LFS which doesn't work on GitHub Pages)
-    private const string WEBGL_CACHE_URL = "https://github.com/Thomas-16/WordleBot/releases/download/cache/pattern_cache.bytes";
+    // GitHub Releases URL via CORS proxy (GitHub doesn't set CORS headers on release assets)
+    private const string WEBGL_CACHE_URL = "https://corsproxy.io/?url=https://github.com/Thomas-16/WordleBot/releases/download/cache/pattern_cache.bytes";
 
     /// <summary>
     /// Async loading for WebGL using UnityWebRequest
