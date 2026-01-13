@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -55,5 +57,50 @@ public class CachePrecomputer : MonoBehaviour
 
         Debug.Log("Precomputation complete! Cache file saved to StreamingAssets folder.");
         Debug.Log("You can now run the game and it will use the cached patterns.");
+    }
+
+    /// <summary>
+    /// Precomputes top 20 initial guesses and saves to file
+    /// Requires pattern cache to be generated first
+    /// </summary>
+    [ContextMenu("Precompute Initial Guesses")]
+    public void PrecomputeInitialGuesses()
+    {
+        Debug.Log("Computing initial guesses cache...");
+
+        if (WordList.Instance == null)
+        {
+            Debug.LogError("WordList not initialized! Make sure it's in the scene.");
+            return;
+        }
+
+        // Load pattern cache first
+        PatternCache patternCache = new PatternCache();
+        if (!patternCache.LoadFromFile())
+        {
+            Debug.LogError("Pattern cache required! Run pattern precomputation first.");
+            return;
+        }
+
+        // Create frequency model
+        var sortedWords = WordList.Instance.GetAllValidWordsSorted();
+        var frequencyModel = new WordFrequencyModel(sortedWords);
+
+        // Create bot and calculate
+        var allWords = WordList.Instance.GetAllValidWords();
+        var bot = new WordleBot(allWords, patternCache, frequencyModel);
+
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        bot.GetBestGuess();
+        Debug.Log($"Calculated in {sw.ElapsedMilliseconds}ms");
+
+        // Get top 20 and save
+        var entropies = bot.GetWordEntropies();
+        var top20 = entropies.OrderByDescending(x => x.Value).Take(20).ToList();
+
+        var cache = new InitialGuessesCache();
+        cache.SaveToFile(top20);
+
+        Debug.Log("Initial guesses cache complete!");
     }
 }

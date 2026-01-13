@@ -11,6 +11,7 @@ public class WordleBot
     private PatternCache patternCache;
     private WordFrequencyModel frequencyModel;
     private Dictionary<string, float> currentProbabilities;
+    private int initialWordCount;
 
 
     public WordleBot(List<string> possibleWords, PatternCache cache = null, WordFrequencyModel freqModel = null)
@@ -19,6 +20,7 @@ public class WordleBot
         this.wordEntropies = new Dictionary<string, float>();
         this.patternCache = cache;
         this.frequencyModel = freqModel;
+        this.initialWordCount = possibleWords.Count;
 
         // Initialize probabilities (normalized for current word set)
         if (frequencyModel != null)
@@ -136,4 +138,8 @@ public class WordleBot
     public Dictionary<string, float> GetWordEntropies() { return wordEntropies; }
 
     public int GetRemainingPossibilitiesCount() { return remainingPossibleWords.Count; }
+
+    public bool IsInitialState() { return remainingPossibleWords.Count == initialWordCount; }
+
+    public void SetWordEntropies(Dictionary<string, float> entropies) { wordEntropies = new Dictionary<string, float>(entropies); }
 }

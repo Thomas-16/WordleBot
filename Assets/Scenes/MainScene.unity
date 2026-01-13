@@ -466,6 +466,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WordDataLoader
   allWordsPath: all_words
+  allWordsSortedPath: all_words_sorted
   possibleWordsPath: possible_wordle_words
 --- !u!114 &141739654
 MonoBehaviour:
@@ -480,6 +481,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WordList
   allValidWords: []
+  allValidWordsSorted: []
   possibleAnswers: []
 --- !u!4 &141739655
 Transform:

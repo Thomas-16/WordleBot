@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     private WordleBot wordleBot;
     private PatternCache patternCache;
     private WordFrequencyModel frequencyModel;
+    private InitialGuessesCache initialGuessesCache;
 
     void Start()
     {
@@ -28,6 +29,10 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Run the CachePrecomputer script to generate the cache file.");
         }
 
+        // Load initial guesses cache
+        initialGuessesCache = new InitialGuessesCache();
+        initialGuessesCache.LoadFromFile();
+
         // Initialize word frequency model with sorted word list
         List<string> sortedWords = WordList.Instance.GetAllValidWordsSorted();
         frequencyModel = new WordFrequencyModel(sortedWords);
@@ -42,7 +47,17 @@ public class GameManager : MonoBehaviour
     private void GetAndDisplayBestGuesses()
     {
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
-        Debug.Log($"Best guess: {wordleBot.GetBestGuess()}, time took: {sw.ElapsedMilliseconds} ms");
+
+        // Use cached results for first turn
+        if (wordleBot.IsInitialState() && initialGuessesCache.IsLoaded())
+        {
+            wordleBot.SetWordEntropies(initialGuessesCache.GetAsEntropiesDictionary());
+            Debug.Log($"Best guess (cached): {initialGuessesCache.GetBestGuess()}, time took: {sw.ElapsedMilliseconds} ms");
+        }
+        else
+        {
+            Debug.Log($"Best guess: {wordleBot.GetBestGuess()}, time took: {sw.ElapsedMilliseconds} ms");
+        }
         sw.Stop();
 
         Dictionary<string, float> wordEntropies = wordleBot.GetWordEntropies();
